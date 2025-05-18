@@ -1,148 +1,223 @@
-import React, { useState, useEffect } from 'react';
-
-// SVGs for platform icons and play icon
-const TeachableIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Teachable" className="inline-block"><circle cx="10" cy="10" r="10" fill="#00C2B2"/><text x="10" y="15" textAnchor="middle" fontSize="10" fill="#fff">T</text></svg>
-);
-const KajabiIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Kajabi" className="inline-block"><circle cx="10" cy="10" r="10" fill="#3A8DFF"/><text x="10" y="15" textAnchor="middle" fontSize="10" fill="#fff">K</text></svg>
-);
-const PlayIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Play"><polygon points="7,5 15,10 7,15" fill="#6366F1"/></svg>
-);
-
-// Animated course creation preview (idea → outline → modules → finished)
-const CoursePreview = () => {
-  const steps = [
-    { label: 'Idea', color: 'bg-yellow-300', icon: '💡' },
-    { label: 'Outline', color: 'bg-green-200', icon: '📝' },
-    { label: 'Modules', color: 'bg-indigo-200', icon: '📦' },
-    { label: 'Finished', color: 'bg-purple-200', icon: '🎉' },
-  ];
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActive((prev) => (prev + 1) % steps.length);
-    }, 1200);
-    return () => clearInterval(interval);
-  }, []);
-  return (
-    <div className="w-full max-w-md mx-auto flex flex-col items-center gap-8 p-8 bg-white/80 rounded-2xl shadow-lg border border-indigo-100 animate-fade-in relative z-10">
-      <div className="flex flex-row justify-between w-full gap-4">
-        {steps.map((step, idx) => (
-          <div key={step.label} className={`flex-1 flex flex-col items-center transition-all duration-500 ${active === idx ? 'scale-110' : 'opacity-60'}`}>
-            <div className={`w-14 h-14 flex items-center justify-center rounded-full text-2xl font-bold ${step.color} mb-2`}>{step.icon}</div>
-            <span className={`text-sm font-medium ${active === idx ? 'text-indigo-700' : 'text-gray-400'}`}>{step.label}</span>
-          </div>
-        ))}
-      </div>
-      <div className="w-full h-2 bg-gradient-to-r from-yellow-200 via-green-200 via-indigo-200 to-purple-200 rounded-full" />
-      <span className="text-sm text-gray-500">See how your course comes to life</span>
-    </div>
-  );
-};
-
-// Decorative floating cards
-const FloatingModuleCard = () => (
-  <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 z-0">
-    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg rotate-6 animate-float flex flex-col items-start min-w-[180px]">
-      <span className="text-xs text-gray-400 mb-1">Course Outline</span>
-      <p className="text-sm font-medium text-gray-700">Module 1: Getting Started</p>
-      <ul className="text-xs text-gray-400 mt-1 space-y-1">
-        <li>• Welcome</li>
-        <li>• What You’ll Learn</li>
-        <li>• First Steps</li>
-      </ul>
-    </div>
-  </div>
-);
-const FloatingExportCard = () => (
-  <div className="hidden md:block absolute right-0 top-2/3 translate-y-1/3 translate-x-1/3 z-0">
-    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg -rotate-3 animate-float-delayed flex items-center gap-2 min-w-[160px]">
-      <span className="text-sm font-medium text-gray-700">Ready to Export ✨</span>
-      <TeachableIcon />
-      <KajabiIcon />
-    </div>
-  </div>
-);
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const Hero = () => {
+  const [courseIdea, setCourseIdea] = useState('');
+  const [placeholder, setPlaceholder] = useState('');
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+  const placeholders = [
+    'AI-powered course on digital marketing',
+    'Masterclass in web development',
+    'Beginner\'s guide to photography'
+  ];
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isTyping) {
+        if (placeholderIndex < placeholders[0].length) {
+          setPlaceholder(prev => prev + placeholders[0].charAt(placeholderIndex));
+          setPlaceholderIndex(prev => prev + 1);
+        } else {
+          setTimeout(() => {
+            setIsTyping(false);
+            setPlaceholder('');
+            setPlaceholderIndex(0);
+          }, 2000);
+        }
+      } else {
+        setPlaceholder('');
+        setPlaceholderIndex(0);
+        setIsTyping(true);
+      }
+    }, isTyping ? 50 : 1000);
+
+    return () => clearTimeout(timeout);
+  }, [placeholderIndex, isTyping]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = '/login';
+  };
+
   return (
-    <section className="min-h-screen pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/30 flex flex-col items-center justify-center">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-4 w-24 h-24 bg-indigo-100 rounded-full blur-3xl opacity-60" />
-        <div className="absolute bottom-1/4 -right-4 w-32 h-32 bg-purple-100 rounded-full blur-3xl opacity-60" />
+    <section className="relative min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4 py-24 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#7357F6]/5 to-[#3EC6FF]/5" />
+        
+        {/* Floating UI Elements */}
+        <motion.div 
+          className="absolute top-1/4 left-[10%] w-48 h-32 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-2xl p-4"
+          initial={{ y: 0, rotate: -5 }}
+          animate={{ y: [0, -15, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="h-2 w-8 bg-[#7357F6]/30 rounded-full mb-2"></div>
+          <div className="h-2 w-16 bg-[#3EC6FF]/30 rounded-full mb-2"></div>
+          <div className="h-2 w-12 bg-[#7357F6]/30 rounded-full"></div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute top-1/3 right-[15%] w-16 h-16 rounded-full bg-gradient-to-br from-[#7357F6] to-[#3EC6FF] flex items-center justify-center shadow-lg"
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Zap className="w-6 h-6 text-white" fill="currentColor" />
+        </motion.div>
+
+        {/* Sparkles */}
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-[#FFD76D] rounded-full"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              boxShadow: '0 0 10px 2px #FFD76D',
+            }}
+            animate={{
+              opacity: [0.2, 1, 0.2],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 2 + Math.random() * 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
       </div>
-      {/* Floating cards as decorative elements */}
-      <FloatingModuleCard />
-      <FloatingExportCard />
-      {/* Main content wrapper */}
-      <div className="w-full max-w-3xl mx-auto flex flex-col items-center px-4 relative z-10">
-        {/* Logo/brand placeholder (if needed) */}
-        {/* <img src="/logo.svg" alt="CourseCraft AI" className="h-10 mb-6" /> */}
-        {/* Powered by AI badge */}
-        <div className="flex items-center gap-2 mb-4 mt-4 justify-center">
-          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">Powered by AI</span>
-        </div>
-        {/* Main headline */}
-        <h1 className="text-5xl md:text-7xl font-bold mb-3 leading-tight bg-gradient-to-r from-gray-900 via-indigo-900 to-gray-900 bg-clip-text text-transparent text-center">
-          Create & Launch Your Course in 1 Hour
-        </h1>
-        {/* Subheadline */}
-        <div className="text-lg text-indigo-700 font-medium mb-6 text-center">From expertise to structured curriculum - automatically</div>
-        {/* Secondary headline */}
-        <h2 className="text-3xl md:text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 text-center">
-          No Overwhelm. Just Output.
-        </h2>
-        {/* Description */}
-        <p className="text-xl text-gray-700 mb-6 max-w-2xl mx-auto text-center">
-          CourseCraft AI transforms your knowledge into professional, ready-to-sell courses in minutes — no tech headaches, no blank pages, no wasted weekends.
-        </p>
-        {/* Trust metric and partner logos */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-8 justify-center w-full">
-          <span className="text-sm text-gray-500 text-center">Used by <span className="font-semibold text-indigo-600">2,500+ instructors</span></span>
-          <span className="hidden sm:inline-block mx-2 text-gray-300">|</span>
-          <div className="flex items-center gap-2 justify-center flex-wrap">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Google-logo-2015.png" alt="Google" className="h-5 w-auto" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Notion_app_logo.png" alt="Notion" className="h-5 w-auto" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Kajabi_logo.png" alt="Kajabi" className="h-5 w-auto" />
-          </div>
-        </div>
-        {/* Animated course creation preview - central visual */}
-        <div className="w-full flex justify-center mb-10">
-          <CoursePreview />
-        </div>
-        {/* Testimonial - prominent and centered */}
-        <div className="flex flex-col items-center gap-3 mb-10 w-full">
-          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Actual Customer Name" className="w-14 h-14 rounded-full border-2 border-indigo-200" />
-          <span className="text-lg italic text-gray-600 text-center max-w-xl">“I went from idea to selling my course in just one afternoon”</span>
-          <span className="text-sm text-gray-500">– Actual Customer Name</span>
-        </div>
-        {/* CTA buttons - side by side on desktop, stacked on mobile */}
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center w-full mb-4">
-          <div className="flex flex-col items-center w-full sm:w-auto">
-            <a 
-              href="#" 
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-medium text-lg hover:shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 flex items-center gap-2 w-full sm:w-auto text-center"
-            >
-              Start Your Course Free
-            </a>
-            <span className="text-xs text-gray-500 mt-2">No credit card required</span>
-          </div>
-          <a 
-            href="#demo" 
-            className="group bg-white text-gray-800 px-8 py-4 rounded-full font-medium text-lg border-2 border-gray-200 hover:border-indigo-500 transition-all flex items-center justify-center gap-2 w-full sm:w-auto text-center"
+
+      {/* Main content */}
+      <div className="relative w-full max-w-5xl mx-auto text-center z-10 px-4">
+        {/* Headline */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12"
+        >
+          <motion.h1 
+            className="text-5xl sm:text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight"
+            initial={{ letterSpacing: '0.5rem', opacity: 0 }}
+            animate={{ letterSpacing: '0.1rem', opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <PlayIcon />
-            Watch Demo
-            <span className="transform group-hover:translate-y-1 transition-transform">↓</span>
-          </a>
-        </div>
-        {/* Guarantee label - always at the bottom */}
-        <div className="mt-2 flex items-center gap-2 justify-center w-full">
-          <span className="text-xs bg-yellow-200 text-yellow-900 font-semibold px-3 py-1 rounded-full">30-day money back guarantee</span>
-        </div>
+            <span className="bg-gradient-to-r from-[#7357F6] to-[#3EC6FF] bg-clip-text text-transparent">
+              Create & Launch Your Courses In Minutes
+            </span>
+          </motion.h1>
+          <motion.p 
+            className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Turn your knowledge into a beautiful, engaging online course with our AI-powered platform.
+            <span className="inline-flex items-center ml-2 text-[#3EC6FF]">
+              <Sparkles className="w-5 h-5 ml-1" />
+            </span>
+          </motion.p>
+        </motion.div>
+
+        {/* Course idea form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="max-w-3xl mx-auto"
+        >
+          <form onSubmit={handleSubmit} className="relative w-full">
+            <div className="relative flex items-center bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 focus-within:ring-2 focus-within:ring-[#7357F6]/30 focus-within:border-transparent transition-all duration-300 p-1">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={courseIdea}
+                  onChange={(e) => setCourseIdea(e.target.value)}
+                  className="w-full px-6 py-5 text-gray-800 bg-transparent border-none focus:outline-none focus:ring-0 rounded-2xl text-lg placeholder-gray-400 pr-8"
+                  placeholder={placeholder || 'What would you like to teach?'}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  {isTyping && (
+                    <div className="w-2 h-5 bg-[#7357F6] rounded-full animate-pulse"></div>
+                  )}
+                </div>
+              </div>
+              <motion.button
+                type="submit"
+                whileHover={{ 
+                  scale: 1.02,
+                  background: 'linear-gradient(135deg, #8A7AFF, #5BC5FF)'
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-gradient-to-r from-[#7357F6] to-[#3EC6FF] text-white px-8 py-5 h-full rounded-xl font-semibold text-lg flex-shrink-0 flex items-center justify-center gap-3 relative overflow-hidden group"
+              >
+                <span className="relative z-10 flex items-center">
+                  Launch My Course
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <motion.span 
+                  className="absolute inset-0 bg-[radial-gradient(circle_at_center,white_10%,transparent_70%)] opacity-0 group-hover:opacity-20 transition-opacity"
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 2 }}
+                />
+              </motion.button>
+            </div>
+          </form>
+          <motion.p 
+            className="text-sm text-gray-500 mt-4 flex items-center justify-center gap-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-xs">✓</span>
+            No credit card required · Get started in seconds
+          </motion.p>
+        </motion.div>
+
+        {/* Trust Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="mt-16"
+        >
+          <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-md px-6 py-3.5 rounded-xl border border-white/30 shadow-lg">
+            <div className="flex -space-x-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7357F6] to-[#3EC6FF] border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm"
+                  initial={{ y: 0 }}
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity, 
+                    delay: i * 0.2,
+                    ease: 'easeInOut' 
+                  }}
+                >
+                  {i === 5 ? '+' : i}
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-gray-700">Trusted by <span className="font-bold text-[#7357F6]">100+</span> instructors</p>
+              <div className="flex items-center mt-1">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+                <span className="ml-2 text-xs text-gray-500">4.9/5 from 25+ reviews</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

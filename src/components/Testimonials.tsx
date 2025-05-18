@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 
 const Testimonials = () => {
   const testimonials = [

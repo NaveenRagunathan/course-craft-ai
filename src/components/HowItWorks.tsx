@@ -1,5 +1,4 @@
-import React from 'react';
-import { MessageSquare, ListTree, Upload } from 'lucide-react';
+import { ListTree, MessageSquare, Upload } from 'lucide-react';
 
 const HowItWorks = () => {
   const steps = [
